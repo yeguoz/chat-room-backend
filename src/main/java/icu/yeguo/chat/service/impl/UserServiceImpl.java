@@ -7,8 +7,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import icu.yeguo.chat.common.ResponseCode;
 import icu.yeguo.chat.exception.BusinessException;
+import icu.yeguo.chat.mapper.GroupMemberMapper;
 import icu.yeguo.chat.model.dto.user.LoginRequest;
 import icu.yeguo.chat.model.dto.user.RegisterRequest;
+import icu.yeguo.chat.model.entity.GroupMember;
 import icu.yeguo.chat.model.entity.User;
 import icu.yeguo.chat.model.vo.UserVO;
 import icu.yeguo.chat.service.UserService;
@@ -21,12 +23,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 
-import static icu.yeguo.chat.constant.UserConstant.*;
+import static icu.yeguo.chat.constant.ChatRoom.GLOBAL_GROUP_ID;
+import static icu.yeguo.chat.constant.User.*;
 
 /**
  * @author Lenovo
- * @description  针对表【user(用户表)】的数据库操作Service实现
- * @createDate  2024-08-10 20:57:53
+ * @description 针对表【user(用户表)】的数据库操作Service实现
+ * @createDate 2024-08-10 20:57:53
  */
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User>
@@ -37,6 +40,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private GroupMemberMapper groupMemberMapper;
 
     @Transactional
     @Override
@@ -69,8 +75,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         String encryptedPassword = aes.encryptHex(password);
         user.setPassword(encryptedPassword);
 
-        int insert = userMapper.insert(user);
-        if (insert != 1) {
+        int userInsert = userMapper.insert(user);
+        if (userInsert != 1) {
+            throw new BusinessException(ResponseCode.REGISTER_ERROR);
+        }
+
+        // 将用户加入全局群中
+        GroupMember groupMember = new GroupMember();
+        groupMember.setGroupRoomId(GLOBAL_GROUP_ID);
+        groupMember.setUid(user.getId());
+        int gMemberInsert = groupMemberMapper.insert(groupMember);
+        if (gMemberInsert != 1) {
             throw new BusinessException(ResponseCode.REGISTER_ERROR);
         }
         return SUCCESS;
