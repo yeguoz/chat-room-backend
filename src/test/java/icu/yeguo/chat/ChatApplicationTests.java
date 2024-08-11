@@ -5,7 +5,7 @@ import cn.hutool.crypto.symmetric.SymmetricAlgorithm;
 import cn.hutool.crypto.symmetric.SymmetricCrypto;
 import org.junit.jupiter.api.Test;
 import java.nio.charset.StandardCharsets;
-import static icu.yeguo.chat.constant.UserConstant.KEY;
+import static icu.yeguo.chat.constant.User.KEY;
 
 class ChatApplicationTests {
 
