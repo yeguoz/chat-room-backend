@@ -104,7 +104,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         validatePasswordLength(password);
         // 邮箱是否存在
         if (!isEmailExists(email)) {
-            throw new BusinessException(ResponseCode.MAILBOX_EXIST_ERROR);
+            throw new BusinessException(ResponseCode.MAILBOX_NOT_EXIST_ERROR);
         }
         // 根据邮箱查询用户
         User user = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getEmail, email));
