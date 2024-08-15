@@ -30,6 +30,12 @@ public class GroupRoom implements Serializable {
     private Long roomId;
 
     /**
+     * 群聊名称
+     */
+    @TableField(value = "name")
+    private String name;
+
+    /**
      * 0不是 1是
      */
     @TableField(value = "is_global_group")

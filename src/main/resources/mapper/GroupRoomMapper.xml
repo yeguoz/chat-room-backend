@@ -6,6 +6,7 @@
     <resultMap id="BaseResultMap" type="icu.yeguo.chat.model.entity.GroupRoom">
         <id property="id" column="id" jdbcType="BIGINT"/>
         <result property="roomId" column="room_id" jdbcType="BIGINT"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
         <result property="isGlobalGroup" column="is_global_group" jdbcType="TINYINT"/>
         <result property="avatar" column="avatar" jdbcType="VARCHAR"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
@@ -14,7 +15,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,room_id,avatar,is_global_group,
+        id,room_id,name,avatar,is_global_group,
         create_time,update_time,is_deleted
     </sql>
 </mapper>
