@@ -70,4 +70,10 @@ public class Message implements Serializable {
     @Serial
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
+
+    public Message(Long fromUid, String content, Long roomId) {
+        this.fromUid = fromUid;
+        this.content = content;
+        this.roomId = roomId;
+    }
 }
