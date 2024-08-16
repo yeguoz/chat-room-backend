@@ -2,8 +2,8 @@ package icu.yeguo.chat.service;
 
 import icu.yeguo.chat.model.entity.Message;
 import com.baomidou.mybatisplus.extension.service.IService;
-import icu.yeguo.chat.model.vo.Combined.MessageANDUserVO;
-import icu.yeguo.chat.model.vo.PageResponse;
+import icu.yeguo.chat.model.vo.Combined.MessageANDUserVo;
+import icu.yeguo.chat.model.vo.CursorResponse;
 
 /**
  * @author Lenovo
@@ -12,7 +12,7 @@ import icu.yeguo.chat.model.vo.PageResponse;
  */
 public interface MessageService extends IService<Message> {
 
-    PageResponse<MessageANDUserVO> pageQuery(long roomId,long currentPage, long pageSize);
+    CursorResponse<MessageANDUserVo> cursorQuery(Long roomId, Long pageSize, Long cursorId);
 
     String getSomeData(String test) throws InterruptedException;
 }

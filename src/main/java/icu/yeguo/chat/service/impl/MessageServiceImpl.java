@@ -2,14 +2,12 @@ package icu.yeguo.chat.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.OrderItem;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import icu.yeguo.chat.model.entity.Message;
 import icu.yeguo.chat.model.entity.User;
-import icu.yeguo.chat.model.vo.Combined.MessageANDUserVO;
-import icu.yeguo.chat.model.vo.PageResponse;
-import icu.yeguo.chat.model.vo.UserVO;
+import icu.yeguo.chat.model.vo.Combined.MessageANDUserVo;
+import icu.yeguo.chat.model.vo.CursorResponse;
+import icu.yeguo.chat.model.vo.UserVo;
 import icu.yeguo.chat.service.MessageService;
 import icu.yeguo.chat.mapper.MessageMapper;
 import icu.yeguo.chat.service.UserService;
@@ -18,7 +16,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -38,50 +35,56 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message>
 
     @Transactional
     @Override
-    public PageResponse<MessageANDUserVO> pageQuery(long roomId, long currentPage, long pageSize) {
-        Page<Message> page = new Page<>(currentPage, pageSize);
-        page.setOrders(Collections.singletonList(OrderItem.desc("id")));
+    public CursorResponse<MessageANDUserVo> cursorQuery(Long roomId, Long pageSize, Long cursorId) {
+        // 构建查询条件
+        QueryWrapper<Message> queryWrapper = new QueryWrapper<Message>()
+                .eq("room_id", roomId)
+                .orderByDesc("id");  // 按照ID倒序排序
 
-        // 查询roomId聊天室的消息
-        Page<Message> messagePage = super.page(page, new QueryWrapper<Message>().eq("room_id", roomId));
-        List<Message> records = messagePage.getRecords();
+        // 如果传入了cursorId游标，则添加ID小于cursorId的条件
+        if (cursorId != null) {
+            queryWrapper
+                    .lt("id", cursorId);
+        }
 
-        if (records.isEmpty()) {
-            return new PageResponse<>(
-                    0,
-                    0,
-                    0,
-                    0,
-                    null);
+        // 查询消息，限制查询的记录数为pageSize
+        List<Message> messageList = super
+                .list(queryWrapper.last("LIMIT " + pageSize));
+
+        // 如果查询结果为空，返回一个空的CursorResponse
+        if (messageList.isEmpty()) {
+            return new CursorResponse<>(null, null, null);
         }
 
         // 获取消息中的所有用户ID
-        List<Long> fromUidList = records.stream()
+        List<Long> fromUidList = messageList
+                .stream()
                 .map(Message::getFromUid)
                 .distinct()
                 .toList();
 
-        // 查询所有用户并将其转换为UserVO
-        Map<Long, UserVO> userVoMap = userService.listByIds(fromUidList).stream()
-                .map(this::getUserVO)
-                .collect(Collectors.toMap(UserVO::getId, Function.identity()));
+        // 查询所有用户并将其转换为UserVo
+        Map<Long, UserVo> userVoMap = userService
+                .listByIds(fromUidList)
+                .stream()
+                .map(this::getUserVo)
+                .collect(Collectors.toMap(UserVo::getId, Function.identity()));
 
         // 把message和userVO组装到一起
-        List<MessageANDUserVO> messageANDUserVOS = records.stream()
-                .map(message -> new MessageANDUserVO(message, userVoMap.get(message.getFromUid())))
+        List<MessageANDUserVo> records = messageList
+                .stream()
+                .map(message -> new MessageANDUserVo(message, userVoMap.get(message.getFromUid())))
                 .toList();
 
-        return new PageResponse<>(
-                messagePage.getPages(),
-                messagePage.getCurrent(),
-                messagePage.getTotal(),
-                messagePage.getSize(),
-                messageANDUserVOS);
+        // 获取当前页最后一条记录的ID作为新的游标
+        Long newCursorId = messageList.get(messageList.size() - 1).getId();
+        // 返回CursorResponse对象，包含新的游标ID、记录数和记录列表
+        return new CursorResponse<>((long) records.size(), newCursorId, records);
     }
 
     @Cacheable(value = "users", key = "#user.getId()")
-    public UserVO getUserVO(User user) {
-        return BeanUtil.toBean(user, UserVO.class);
+    public UserVo getUserVo(User user) {
+        return BeanUtil.toBean(user, UserVo.class);
     }
 
 

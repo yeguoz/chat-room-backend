@@ -3,8 +3,8 @@ package icu.yeguo.chat.controller;
 import icu.yeguo.chat.common.Result;
 import icu.yeguo.chat.common.ResultUtils;
 import icu.yeguo.chat.model.entity.GroupRoom;
-import icu.yeguo.chat.model.vo.Combined.MessageANDUserVO;
-import icu.yeguo.chat.model.vo.PageResponse;
+import icu.yeguo.chat.model.vo.Combined.MessageANDUserVo;
+import icu.yeguo.chat.model.vo.CursorResponse;
 import icu.yeguo.chat.service.GroupRoomService;
 import icu.yeguo.chat.service.MessageService;
 import lombok.extern.slf4j.Slf4j;
@@ -31,10 +31,9 @@ public class ChatRoomController {
     }
 
     @GetMapping("messages")
-    public Result<PageResponse<MessageANDUserVO>> getMessages(@RequestParam("roomId") Long roomId,
-                                                              @RequestParam("currentPage") Long currentPage,
-                                                              @RequestParam("pageSize") Long pageSize) {
-        return ResultUtils.success(messageService.pageQuery(roomId, currentPage, pageSize));
+    public Result<CursorResponse<MessageANDUserVo>> getMessages(@RequestParam("roomId") Long roomId,
+                                                                @RequestParam("pageSize") Long pageSize,
+                                                                @RequestParam("cursorId") Long cursorId) {
+        return ResultUtils.success(messageService.cursorQuery(roomId, pageSize, cursorId));
     }
-
 }
