@@ -6,7 +6,7 @@ import icu.yeguo.chat.common.ResultUtils;
 import icu.yeguo.chat.exception.BusinessException;
 import icu.yeguo.chat.model.dto.user.LoginRequest;
 import icu.yeguo.chat.model.dto.user.RegisterRequest;
-import icu.yeguo.chat.model.vo.UserVO;
+import icu.yeguo.chat.model.vo.UserVo;
 import icu.yeguo.chat.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -39,7 +39,7 @@ public class UserController {
      * @param: LoginRequest
      */
     @PostMapping("login")
-    public Result<UserVO>  login(@RequestBody LoginRequest loginRequest, HttpServletRequest req) {
+    public Result<UserVo>  login(@RequestBody LoginRequest loginRequest, HttpServletRequest req) {
         if (loginRequest == null) {
             throw new BusinessException(ResponseCode.PARAMS_ERROR);
         }
@@ -51,7 +51,7 @@ public class UserController {
      * @param: HttpServletRequest
      * */
     @GetMapping("currentUser")
-    public Result<UserVO> getCurrentUser(HttpServletRequest req) {
+    public Result<UserVo> getCurrentUser(HttpServletRequest req) {
         return ResultUtils.success(userService.getCurrentUser(req));
     }
 

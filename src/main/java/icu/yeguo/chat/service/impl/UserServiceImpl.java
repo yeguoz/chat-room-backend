@@ -12,7 +12,7 @@ import icu.yeguo.chat.model.dto.user.LoginRequest;
 import icu.yeguo.chat.model.dto.user.RegisterRequest;
 import icu.yeguo.chat.model.entity.GroupMember;
 import icu.yeguo.chat.model.entity.User;
-import icu.yeguo.chat.model.vo.UserVO;
+import icu.yeguo.chat.model.vo.UserVo;
 import icu.yeguo.chat.service.UserService;
 import icu.yeguo.chat.mapper.UserMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -92,7 +92,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     @Override
-    public UserVO login(LoginRequest loginRequest, HttpServletRequest req) {
+    public UserVo login(LoginRequest loginRequest, HttpServletRequest req) {
         if (BeanUtil.isEmpty(loginRequest)) {
             throw new BusinessException(ResponseCode.PARAMS_ERROR);
         }
@@ -119,18 +119,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         HttpSession session = req.getSession();
         session.setAttribute(SESSION, user);
         // 返回userVO
-        return BeanUtil.copyProperties(user, UserVO.class);
+        return BeanUtil.copyProperties(user, UserVo.class);
     }
 
     @Override
-    public UserVO getCurrentUser(HttpServletRequest req) {
+    public UserVo getCurrentUser(HttpServletRequest req) {
         HttpSession session = req.getSession();
         User currentUser = (User) session.getAttribute(SESSION);
         if (currentUser == null) {
             throw new BusinessException(ResponseCode.NOT_LOGIN_ERROR);
         }
         // 返回userVO
-        return BeanUtil.copyProperties(currentUser, UserVO.class);
+        return BeanUtil.copyProperties(currentUser, UserVo.class);
     }
 
 

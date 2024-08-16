@@ -4,7 +4,7 @@ import icu.yeguo.chat.model.dto.user.LoginRequest;
 import icu.yeguo.chat.model.dto.user.RegisterRequest;
 import icu.yeguo.chat.model.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
-import icu.yeguo.chat.model.vo.UserVO;
+import icu.yeguo.chat.model.vo.UserVo;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
@@ -16,7 +16,7 @@ public interface UserService extends IService<User> {
 
     Integer register(RegisterRequest registerRequest);
 
-    UserVO login(LoginRequest loginRequest, HttpServletRequest req);
+    UserVo login(LoginRequest loginRequest, HttpServletRequest req);
 
-    UserVO getCurrentUser(HttpServletRequest req);
+    UserVo getCurrentUser(HttpServletRequest req);
 }
