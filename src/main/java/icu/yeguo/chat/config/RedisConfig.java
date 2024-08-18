@@ -14,10 +14,12 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisIndexedHttpSession;
 
 import java.time.Duration;
 
 @EnableCaching
+@EnableRedisIndexedHttpSession(maxInactiveIntervalInSeconds = 60 * 60 * 24)
 @Configuration
 public class RedisConfig {
     @Bean
