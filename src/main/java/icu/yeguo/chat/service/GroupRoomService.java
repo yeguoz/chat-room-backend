@@ -2,6 +2,9 @@ package icu.yeguo.chat.service;
 
 import icu.yeguo.chat.model.entity.GroupRoom;
 import com.baomidou.mybatisplus.extension.service.IService;
+import icu.yeguo.chat.model.vo.UserVo;
+
+import java.util.List;
 
 /**
 * @author Lenovo
@@ -10,4 +13,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface GroupRoomService extends IService<GroupRoom> {
     GroupRoom getGlobalRoom();
+
+    List<UserVo> getGroupUsers(Long roomId);
 }
