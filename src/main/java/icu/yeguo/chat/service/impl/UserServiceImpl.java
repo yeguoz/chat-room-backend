@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 
 import static icu.yeguo.chat.constant.ChatRoom.GLOBAL_GROUP_ID;
 import static icu.yeguo.chat.constant.User.*;
@@ -91,6 +92,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         return SUCCESS;
     }
 
+    @Transactional
     @Override
     public UserVo login(LoginRequest loginRequest, HttpServletRequest req) {
         if (BeanUtil.isEmpty(loginRequest)) {
@@ -115,8 +117,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (!aes.decryptStr(user.getPassword()).equals(password)) {
             throw new BusinessException(ResponseCode.PASSWD_ERROR);
         }
+        // 设置ActiveStatus和LastOnlineTime(用来排序)
+        user.setActiveStatus(ONLINE);
+        user.setLastOnlineTime(new Date());
+        int i = userMapper.updateById(user);
+        if (i < 1)
+            throw new BusinessException(ResponseCode.SYSTEM_ERROR);
         // 设置session
         HttpSession session = req.getSession();
+
         session.setAttribute(SESSION, user);
         // 返回userVO
         return BeanUtil.copyProperties(user, UserVo.class);
@@ -127,6 +136,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         HttpSession session = req.getSession();
         User currentUser = (User) session.getAttribute(SESSION);
         if (currentUser == null) {
+            throw new BusinessException(ResponseCode.NOT_LOGIN_ERROR);
+        }
+        User user = userMapper.selectById(currentUser.getId());
+        if (user == null) {
             throw new BusinessException(ResponseCode.NOT_LOGIN_ERROR);
         }
         // 返回userVO
