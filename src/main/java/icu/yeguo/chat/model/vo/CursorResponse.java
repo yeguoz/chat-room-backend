@@ -12,6 +12,7 @@ import java.util.List;
 public class CursorResponse<T> implements Serializable {
     @Serial
     private static final long serialVersionUID = -9191962396766181716L;
+    private Long roomId;
     private Long pageSize;
     private Long cursorId;
     private List<T> records;

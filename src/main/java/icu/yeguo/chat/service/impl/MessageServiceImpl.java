@@ -53,7 +53,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message>
 
         // 如果查询结果为空，返回一个空的CursorResponse
         if (messageList.isEmpty()) {
-            return new CursorResponse<>(null, null, null);
+            return new CursorResponse<>(roomId,null, null, null);
         }
 
         // 获取消息中的所有用户ID
@@ -79,7 +79,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message>
         // 获取当前页最后一条记录的ID作为新的游标
         Long newCursorId = messageList.get(messageList.size() - 1).getId();
         // 返回CursorResponse对象，包含新的游标ID、记录数和记录列表
-        return new CursorResponse<>((long) records.size(), newCursorId, records);
+        return new CursorResponse<>(roomId, (long) records.size(), newCursorId, records);
     }
 
     @Cacheable(value = "users", key = "#user.getId()")
