@@ -12,6 +12,7 @@ import icu.yeguo.chat.service.MessageService;
 import icu.yeguo.chat.mapper.MessageMapper;
 import icu.yeguo.chat.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,7 +54,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message>
 
         // 如果查询结果为空，返回一个空的CursorResponse
         if (messageList.isEmpty()) {
-            return new CursorResponse<>(roomId,null, null, null);
+            return new CursorResponse<>(roomId, null, null, null);
         }
 
         // 获取消息中的所有用户ID
@@ -87,6 +88,10 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message>
         return BeanUtil.toBean(user, UserVo.class);
     }
 
+    @CachePut(value = "users", key = "#user.getId()")
+    public UserVo updateUserCache(User user) {
+        return BeanUtil.toBean(user, UserVo.class);
+    }
 
     @Cacheable(value = "my_cache") //将方法结果缓存到"my_cache"中，key为方法参数的哈希值
     public String getSomeData(String id) throws InterruptedException {
