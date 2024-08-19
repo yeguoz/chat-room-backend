@@ -1,9 +1,6 @@
 package icu.yeguo.chat.model.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -56,7 +53,7 @@ public class SingleRoom implements Serializable {
     /**
      * 0 正常 1 删除
      */
-    @TableField(value = "is_deleted")
+    @TableLogic(value = "is_deleted")
     private Integer isDeleted;
 
     @Serial
