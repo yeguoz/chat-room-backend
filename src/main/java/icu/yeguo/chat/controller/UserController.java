@@ -44,6 +44,7 @@ public class UserController {
 
     @Value("${picgo.path.linux}")
     private String picgoPathLinux;
+
     /**
      * 注册
      *
@@ -101,7 +102,7 @@ public class UserController {
     }
 
     @Transactional
-    @PostMapping("/upload")
+    @PostMapping("upload")
     public Result<UserVo> uploadAvatar(@RequestPart(value = "image") MultipartFile image, HttpServletRequest req) {
         Path tempFilePath = null;
         try {
@@ -123,24 +124,43 @@ public class UserController {
                 picgoPath = picgoPathLinux;
             }
             String command = picgoPath + " upload " + tempFilePath;
+            log.info("Executing command: {}", command);
+
             Process process = Runtime.getRuntime().exec(command);
 
-            // 获取 PicGo 上传的结果
+            // 读取标准输出
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            StringBuilder outputBuilder = new StringBuilder();
             String line;
+            while ((line = reader.readLine()) != null) {
+                outputBuilder.append(line).append("\n");
+            }
+
+            // 读取错误输出
+            BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            StringBuilder errorBuilder = new StringBuilder();
+            while ((line = errorReader.readLine()) != null) {
+                errorBuilder.append(line).append("\n");
+            }
+
+            process.waitFor();
+            log.info("PicGo output: {}", outputBuilder);
+            log.error("PicGo error: {}", errorBuilder);
+
             String imageUrl = null;
             boolean foundSuccess = false;
 
-            while ((line = reader.readLine()) != null) {
+            // 解析 PicGo 输出
+            String output = outputBuilder.toString();
+            for (String outputLine : output.split("\n")) {
                 if (foundSuccess) {
-                    imageUrl = line.trim();
+                    imageUrl = outputLine.trim();
                     break;
                 }
-                if (line.contains("[PicGo SUCCESS]:")) {
+                if (outputLine.contains("[PicGo SUCCESS]:")) {
                     foundSuccess = true;
                 }
             }
-            process.waitFor();
 
             if (imageUrl != null && imageUrl.contains("https://")) {
                 // 更新用户头像 URL，并保存到数据库
@@ -158,7 +178,7 @@ public class UserController {
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("Exception during file upload: ", e);
             return ResultUtils.error(500, "上传出现异常");
         } finally {
             // 删除临时文件
