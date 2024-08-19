@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,7 +39,11 @@ public class UserController {
     private UserService userService;
     @Autowired
     private MessageService messageService;
+    @Value("${picgo.path.windows}")
+    private String picgoPathWindows;
 
+    @Value("${picgo.path.linux}")
+    private String picgoPathLinux;
     /**
      * 注册
      *
@@ -113,9 +118,9 @@ public class UserController {
             String os = System.getProperty("os.name").toLowerCase();
             String picgoPath;
             if (os.contains("windows")) {
-                picgoPath = "E:\\Opt\\npm_package\\picgo.cmd";
+                picgoPath = picgoPathWindows;
             } else {
-                picgoPath = "/usr/local/bin/picgo";
+                picgoPath = picgoPathLinux;
             }
             String command = picgoPath + " upload " + tempFilePath;
             Process process = Runtime.getRuntime().exec(command);
