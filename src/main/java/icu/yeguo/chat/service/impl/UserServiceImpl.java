@@ -138,12 +138,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (currentUser == null) {
             throw new BusinessException(ResponseCode.NOT_LOGIN_ERROR);
         }
-        User user = userMapper.selectById(currentUser.getId());
-        if (user == null) {
+        User newUser = userMapper.selectById(currentUser.getId());
+        if (newUser == null) {
             throw new BusinessException(ResponseCode.NOT_LOGIN_ERROR);
         }
         // 返回userVO
-        return BeanUtil.copyProperties(currentUser, UserVo.class);
+        return BeanUtil.copyProperties(newUser, UserVo.class);
     }
 
 
