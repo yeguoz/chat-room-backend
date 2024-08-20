@@ -48,4 +48,4 @@ knife4j:
 picgo:
   path:
     windows: E:\\Opt\\npm_package\\picgo.cmd
-    linux: /root/.nvm/versions/node/v22.6.0/bin/picgo
+    linux: /root/.nvm/versions/node/v20.16.0/bin/picgo
