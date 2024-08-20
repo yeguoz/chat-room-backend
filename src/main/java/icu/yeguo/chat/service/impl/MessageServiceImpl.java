@@ -40,6 +40,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message>
         // 构建查询条件
         QueryWrapper<Message> queryWrapper = new QueryWrapper<Message>()
                 .eq("room_id", roomId)
+                .eq("is_deleted", 0) // 只查询未删除的记录
                 .orderByDesc("id");  // 按照ID倒序排序
 
         // 如果传入了cursorId游标，则添加ID小于cursorId的条件
